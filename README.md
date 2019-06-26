@@ -12,7 +12,7 @@ pip install .
 
 ## Configure
 
-Edit the config file at `gazer/config/config.yaml`, or override those options with environment variables of the same names.
+Copy and edit the config file at `gazer/config/config.yaml.template`, or override those options with environment variables of the same names.
 
 ## Usage
 

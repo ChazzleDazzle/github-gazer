@@ -108,4 +108,4 @@ venv.bak/
 .idea/
 
 # ignore config after initial upload. 
-**/config
+

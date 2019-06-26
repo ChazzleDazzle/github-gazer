@@ -1,3 +1,4 @@
+# Copy and rename this file to "config.yaml"
 # Uncomment this block, and fill in values as appropriate. 
 # These values can also be overwritten using ENV variables of the same name, locally. 
 # DAYS_DEPTH: 2
@@ -14,4 +15,4 @@
 # RELEASE_REPOS:
 #   # Repositories to which you would like to be notified about pull requests to a release branch.  
 #   # ex: 
-#   # - "main-app"
+#   # - "main-app" 
