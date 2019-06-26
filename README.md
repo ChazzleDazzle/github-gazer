@@ -7,7 +7,7 @@ Watch for GitHub review requests, and release branch pull requests, and notify o
 Clone and install from local.  From root directory, run:  
 
 ```bash
-pip install .
+mkvritualenv --python=`which python3` gazer && pip install .
 ```
 
 ## Configure
@@ -25,5 +25,5 @@ gazer
 Suggested usage would be to set up a local cron to poll regularly.
 
 ```cron
-0/2 9-16 * * MON-FRI /path/to/my/virtualenv/gazer/bin/python3 gazer
+0/2 9-16 * * MON-FRI /path/to/my/virtualenv/gazer/bin/gazer
 ```
