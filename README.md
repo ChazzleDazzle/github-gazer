@@ -1,4 +1,5 @@
 # github-gazer
+
 Watch for GitHub review requests, and release branch pull requests, and notify on Slack.
 
 ## Installation
@@ -15,6 +16,14 @@ Edit the config file at `gazer/config/config.yaml`, or override those options wi
 
 ## Usage
 
+Default usage will run a poll against your configured repos.  
+
 ```bash
 gazer
+```
+
+Suggested usage would be to set up a local cron to poll regularly.
+
+```cron
+0/2 9-16 * * MON-FRI /path/to/my/virtualenv/gazer/bin/python3 gazer
 ```
