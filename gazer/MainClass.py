@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from __future__ import print_function
 from os import environ
 from datetime import datetime, timedelta
 import re
@@ -13,18 +12,23 @@ import requests
 
 class Gazer(object):
     def __init__(self):
-        self.gazer_api_token = self.get_config_var("GAZER_API_TOKEN")
-        self.slack_webhook = self.get_config_var("SLACK_WEBHOOK")
-        self.review_repos = self.get_config_var("REVIEW_REPOS")
-        self.days_depth = self.since(self.get_config_var("DAYS_DEPTH"))
-        self.release_repos = self.get_config_var("RELEASE_REPOS")
-        self.hub = Github(self.gazer_api_token)
+        self.hub = Github(self.get_config_var("GAZER_API_TOKEN"))
         self.me = self.hub.get_user()
         self.org = self.hub.get_organization(self.get_config_var("ORG_NAME"))
+        self.review_repos = [
+            self.org.get_repo(repo_name)
+            for repo_name in self.get_config_var("REVIEW_REPOS")
+        ]
+        self.release_repos = [
+            self.org.get_repo(repo_name)
+            for repo_name in self.get_config_var("RELEASE_REPOS")
+        ]
+        self.days_depth = self.since(self.get_config_var("DAYS_DEPTH"))
         self.release_regex = re.compile(self.get_config_var("RELEASE_REGEX"))
+        self.slack_webhook = self.get_config_var("SLACK_WEBHOOK")
 
     def get_config_var(self, v):
-        # Override config from env or read them from config file.
+        """Override config from env or read them from config file."""
         if environ.get(v):
             return environ.get(v)
         with open(glob("**/config/config.yaml", recursive=True)[0], "r") as stream:
@@ -36,21 +40,22 @@ class Gazer(object):
         return since
 
     def poll_my_review_requests(self):
-        """Get current notifications about your review requests in a given , and send a slack message to a specified webhook."""
-
+        """Get current notifications about your review requests, and send a slack message to a specified webhook."""
         for note in self.me.get_notifications(since=self.days_depth):
             if (
-                note.repository.name in self.review_repos
+                note.repository in self.review_repos
                 and note.reason == "review_requested"
+                and note.subject.type == "PullRequest"
                 and note.unread
             ):
-                note.repository.get_pulls()
-
+                pull = note.repository.get_pull(
+                    int(note.subject.url.split("pulls/")[1])
+                )
                 payload = json.dumps(
                     {
                         "text": f"""Your review is requested in {note.repository.name}. 
                     \nSubject: {note.subject.title}
-                    \n{note.repository.html_url}"""
+                    \n{pull.html_url}"""
                     }
                 )
                 # Send the Slack message, mark the notification as read.
@@ -58,8 +63,8 @@ class Gazer(object):
                 note.mark_as_read()
 
     def poll_release_pull_requests(self):
-        for repo_name in self.release_repos:
-            repo = self.org.get_repo(repo_name)
+        """Poll for pull requests to an active release branch."""
+        for repo in self.release_repos:
             release_branches = [
                 branch
                 for branch in repo.get_branches()
@@ -81,6 +86,6 @@ class Gazer(object):
                 requests.post(self.slack_webhook, data=payload)
 
     def poll_and_notify_all(self):
-        # Run poll and notify
+        """Run poll and notify for both review requests, and prs against release branches."""
         self.poll_my_review_requests()
         self.poll_release_pull_requests()
