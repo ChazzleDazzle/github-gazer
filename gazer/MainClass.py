@@ -68,7 +68,7 @@ class Gazer(object):
             release_branches = [
                 branch
                 for branch in repo.get_branches()
-                if self.release_regex.fullmatch(branch.name)
+                if self.release_regex.match(branch.name)
             ]
             pulls = [
                 pull
