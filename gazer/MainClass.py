@@ -1,38 +1,50 @@
 #!/usr/bin/env python
 
-from os import environ
+import argparse
 from datetime import datetime, timedelta
-import re
 from glob import glob
 import json
+from os import environ
 import yaml
 from github import Github
 import requests
 
 
-class Gazer(object):
-    def __init__(self):
+class Gazer:
+    def __init__(self, environment, configyaml):
+        self.configyaml = configyaml
+        self.environment = environment
         self.hub = Github(self.get_config_var("GAZER_API_TOKEN"))
         self.me = self.hub.get_user()
-        self.org = self.hub.get_organization(self.get_config_var("ORG_NAME"))
-        self.review_repos = [
-            self.org.get_repo(repo_name)
-            for repo_name in self.get_config_var("REVIEW_REPOS")
-        ]
-        self.release_repos = [
-            self.org.get_repo(repo_name)
-            for repo_name in self.get_config_var("RELEASE_REPOS")
-        ]
+        if self.get_config_var("ORG_NAME"):
+            self.org = self.hub.get_organization(self.get_config_var("ORG_NAME"))
+        self.review_repos = self.get_repos_list("REVIEW_REPOS")
+        self.release_repos = self.get_repos_list("RELEASE_REPOS")
         self.days_depth = self.since(self.get_config_var("DAYS_DEPTH"))
-        self.release_regex = re.compile(self.get_config_var("RELEASE_REGEX"))
         self.slack_webhook = self.get_config_var("SLACK_WEBHOOK")
+
+    def get_repos_list(self, repos_type):
+        """Get Organization or personal repos based on whether self.org is None"""
+        if self.org:
+            return [
+                self.org.get_repo(repo_name)
+                for repo_name in self.get_config_var(repos_type)
+            ]
+        return [
+            self.me.get_repo(f"{me.login}/{repo_name}")
+            for repo_name in self.get_config_var(repos_type)
+        ]
 
     def get_config_var(self, v):
         """Override config from env or read them from config file."""
         if environ.get(v):
             return environ.get(v)
-        with open(glob("**/config/config.yaml", recursive=True)[0], "r") as stream:
-            return yaml.safe_load(stream)[v]
+        with open(glob(self.configyaml, recursive=True)[0], "r") as stream:
+            try:
+                return yaml.safe_load(stream)[self.environment][v]
+            except Exception as e:
+                print(e)
+                return None
 
     def since(self, days):
         """Get datetime object for days since back to look.  Set to 2 for weekend."""
@@ -65,11 +77,13 @@ class Gazer(object):
     def poll_release_pull_requests(self):
         """Poll for pull requests to an active release branch."""
         for repo in self.release_repos:
+            # Get the last 5 protected branches
             release_branches = [
                 branch
-                for branch in repo.get_branches()
-                if self.release_regex.match(branch.name)
-            ]
+                for branch in repo.get_branches().reversed
+                if branch.protected and branch.name is not "master"
+            ][:5]
+            # Gather any open pull requests on the protected branches
             pulls = [
                 pull
                 for pull in repo.get_pulls(state="open")

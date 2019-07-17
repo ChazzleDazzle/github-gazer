@@ -1,7 +1,12 @@
 #!/usr/bin/env python
 
+import argparse
 from gazer.MainClass import Gazer
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--environment", "-e", default="PROD")
+parser.add_argument("--config", "-c", default="**/config/config.yaml")
+args = parser.parse_args()
 
-gazer = Gazer()
+gazer = Gazer(args.environment, args.config)
 gazer.poll_and_notify_all()
