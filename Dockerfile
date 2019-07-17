@@ -12,4 +12,4 @@ RUN apt-get update \
 RUN cd /gazer \
     && pip install . 
 
-CMD ["python", "./gazer/bin/gazer"]
+CMD ["python", "./gazer/bin/gazer", "--config", "/config/config.yaml"]

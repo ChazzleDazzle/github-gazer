@@ -79,7 +79,7 @@ class Gazer:
         for repo in self.release_repos:
             # Get the last 5 protected branches
             release_branches = [
-                branch
+                branch.name
                 for branch in repo.get_branches().reversed
                 if branch.protected and branch.name is not "master"
             ][:5]
@@ -87,12 +87,12 @@ class Gazer:
             pulls = [
                 pull
                 for pull in repo.get_pulls(state="open")
-                if pull.head in release_branches
+                if pull.base.ref in release_branches
             ]
             for pull in pulls:
                 payload = json.dumps(
                     {
-                        "text": f"""A new pull request has been created for {repo_name} at {pull.head}.
+                        "text": f"""A new pull request has been created for {repo.name} at {pull.base.ref}.
                                 \n{pull.html_url}"""
                     }
                 )
