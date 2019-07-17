@@ -1,18 +1,19 @@
 # Copy and rename this file to "config.yaml"
 # Uncomment this block, and fill in values as appropriate. 
 # These values can also be overwritten using ENV variables of the same name, locally. 
-# DAYS_DEPTH: 2
-# ORG_NAME: [your_org_name]
-# RELEASE_REGEX: [regex_pattern_for_release_branch] # (ex: "^release[0-9]{1,4}$")
-# GAZER_API_TOKEN: [your_personal_github_api_token]
-# SLACK_WEBHOOK: [slack_webhook]
-# REVIEW_REPOS:
-#   # Repositories to which you would like to be notified about review requests.
-#   # All of these must belong to the Github org specified in ORG_NAME 
-#   # ex: 
-#   # - "main-app"
-#   # - "my-dev-ops-repo"
-# RELEASE_REPOS:
-#   # Repositories to which you would like to be notified about pull requests to a release branch.  
-#   # ex: 
-#   # - "main-app" 
+# PROD:
+#   DAYS_DEPTH: 2
+#   ORG_NAME: [your_org_name]
+#   RELEASE_REGEX: [regex_pattern_for_release_branch] # (ex: "^release[0-9]{1,4}$")
+#   GAZER_API_TOKEN: [your_personal_github_api_token]
+#   SLACK_WEBHOOK: [slack_webhook]
+#   REVIEW_REPOS:
+#     # Repositories to which you would like to be notified about review requests.
+#     # All of these must belong to the Github org specified in ORG_NAME 
+#     # ex: 
+#     # - "main-app"
+#     # - "my-dev-ops-repo"
+#   RELEASE_REPOS:
+#     # Repositories to which you would like to be notified about pull requests to a release branch.  
+#     # ex: 
+#     # - "main-app" 
