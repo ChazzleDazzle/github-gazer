@@ -81,13 +81,13 @@ class Gazer:
             release_branches = [
                 branch.name
                 for branch in repo.get_branches().reversed
-                if branch.protected and branch.name is not "master"
+                if branch.protected and branch.name != "master"
             ][:5]
             # Gather any open pull requests on the protected branches
             pulls = [
                 pull
                 for pull in repo.get_pulls(state="open")
-                if pull.base.ref in release_branches
+                if pull.base.ref in release_branches and pull.mergeable_state == "clean"
             ]
             for pull in pulls:
                 payload = json.dumps(
