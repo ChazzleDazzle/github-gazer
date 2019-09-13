@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="gazer",
-    version="0.0.2",
+    version="0.0.3",
     description="Watch GitHub for my review requests, or pull requests to release branches, and notify over Slack.",
     author="Charlie Gibson",
     author_email="gibson.charlie@gmail.com",
