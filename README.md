@@ -38,4 +38,4 @@ Running as a docker container:
     1. From the repo's root directory: `docker build . -t gazer:latest`
 1. Add the cron in crontab:
     1. `crontab -e`
-    1. To run every 2 minutes, 9-5, every weekday, add: `*/2 9-17 * * MON-FRI docker run gazer:latest`
+    1. To run every 2 minutes, 9-5, every weekday, add: `*/2 9-17 * * MON-FRI docker run gazer`
